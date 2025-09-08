@@ -375,9 +375,8 @@ JSDialog.iconView = function (
 			builder.callback('iconview', 'activate', data, selectedIndex, builder);
 	});
 
-<<<<<<< HEAD
 	// ensures that aria-selected is updated on initial focus on iconview entries
-	container.addEventListener('focusin', function (e: FocusEvent) {
+	commonContainer.addEventListener('focusin', function (e: FocusEvent) {
 		const target = e.target as HTMLElement;
 
 		if (
@@ -398,9 +397,7 @@ JSDialog.iconView = function (
 		target.setAttribute('aria-selected', 'true');
 	});
 
-=======
 	commonContainer.updateRenders = container.updateRenders;
 	commonContainer.onSelect = container.onSelect;
->>>>>>> 6a511fc4e5 (make writer iconview expandable)
 	return false;
 };
