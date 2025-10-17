@@ -224,7 +224,9 @@ JSDialog.iconView = function (
 				data.id,
 				commonContainer,
 				[{ type: 'json', content: data }],
-				builder._defaultCallbackHandler.bind(builder),
+				// TODO: below we need custom callback which will translate used windowId to the original
+				// windowId of the "builder" instance from this scope (numric value)
+				builder._defaultCallbackHandlerSendMessage.bind(builder),
 			);
 			bIsExpanded = true;
 			data.isExpandable = isExpandable;
