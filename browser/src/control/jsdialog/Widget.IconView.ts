@@ -224,7 +224,7 @@ JSDialog.iconView = function (
 				data.id,
 				commonContainer,
 				[{ type: 'json', content: data }],
-				builder._defaultCallbackHandlerSendMessage,
+				builder._defaultCallbackHandler.bind(builder),
 			);
 			bIsExpanded = true;
 			data.isExpandable = isExpandable;
