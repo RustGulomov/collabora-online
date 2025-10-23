@@ -1451,10 +1451,10 @@ DocumentBroker::updateSessionWithWopiInfo(const std::shared_ptr<ClientSession>& 
                                                         WopiStorage::WOPIFileInfo::TriState::True);
     wopiInfo->set("IsOwner", session->isDocumentOwner());
 
-    bool disablePresentation = wopiFileInfo->getDisableExport() || wopiFileInfo->getHideExportOption();
+    //bool disablePresentation = wopiFileInfo->getDisableExport() || wopiFileInfo->getHideExportOption();
     // the new slideshow supports watermarking, anyway it's still an experimental features
-    disablePresentation = disablePresentation || (!ConfigUtil::getBool("canvas_slideshow_enabled", true) && !watermarkText.empty());
-    wopiInfo->set("DisablePresentation", disablePresentation);
+    //disablePresentation = disablePresentation || (!ConfigUtil::getBool("canvas_slideshow_enabled", true) && !watermarkText.empty());
+    wopiInfo->set("DisablePresentation", false);
 
     std::ostringstream ossWopiInfo;
     wopiInfo->stringify(ossWopiInfo);
