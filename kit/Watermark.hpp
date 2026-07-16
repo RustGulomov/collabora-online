@@ -24,15 +24,6 @@
 
 class Watermark final
 {
-    struct PixmapData
-    {
-        std::vector<unsigned char> pixels;
-        int width;
-        int height;
-        PixmapData() : width(0), height(0) {}
-        PixmapData(int w, int h) : pixels(w * h * 4), width(w), height(h) {}
-    };
-
 public:
     Watermark(const std::shared_ptr<lok::Document>& loKitDoc, const std::string& text,
               double opacity)
@@ -59,22 +50,18 @@ public:
         const int width = tileWidth * 0.8;
         const int height = tileHeight * 0.8;
 
-        const PixmapData* pmData = getPixmap(width, height);
+        const std::vector<unsigned char>* pixmap = getPixmap(width, height);
 
-        if (pmData && tilePixmap)
+        if (pixmap && tilePixmap)
         {
-            // Use actual rendered dimensions for centering and blending
-            const int actualWidth = pmData->width;
-            const int actualHeight = pmData->height;
-
             // center watermark
-            const int maxX = std::min(tileWidth, actualWidth);
-            const int maxY = std::min(tileHeight, actualHeight);
+            const int maxX = std::min(tileWidth, width);
+            const int maxY = std::min(tileHeight, height);
             offsetX += (tileWidth - maxX) / 2;
             offsetY += (tileHeight - maxY) / 2;
-            alphaBlend(pmData->pixels, actualWidth, actualHeight, offsetX, offsetY,
+            alphaBlend(*pixmap, width, height, offsetX, offsetY,
                        tilePixmap, tilesPixmapWidth, tilesPixmapHeight,
-                       /*isFontBlending*/ false, isSlideShowLayer);
+                       /*isFontBlending*/ false,  isSlideShowLayer);
         }
     }
 
@@ -119,7 +106,7 @@ private:
     }
 
     /// Create bitmap that we later use as the watermark for every tile.
-    const PixmapData* getPixmap(int width, int height)
+    const std::vector<unsigned char>* getPixmap(int width, int height)
     {
         if (_loKitDoc == nullptr)
         {
@@ -128,10 +115,9 @@ private:
 
         const size_t key = width + height * 10000;
 
-        auto it = _pixmaps.find(key);
-        if (it != _pixmaps.end())
+        if (_pixmaps.find(key) != _pixmaps.end())
         {
-            return &it->second;
+            return &_pixmaps[key];
         }
 
         // renderFont returns a buffer based on RGBA mode, where r, g, b
@@ -152,9 +138,8 @@ private:
         // No longer needed.
         std::free(textPixels);
 
-        _pixmaps.emplace(key, PixmapData(width, height));
-        PixmapData& pmData = _pixmaps[key];
-        std::vector<unsigned char>& _pixmap = pmData.pixels;
+        _pixmaps.emplace(key, std::vector<unsigned char>(pixel_count));
+        std::vector<unsigned char>& _pixmap = _pixmaps[key];
 
         /*
             apply 2d rotation transformation (counter-clockwise):
@@ -235,7 +220,7 @@ private:
             *p = static_cast<unsigned char>(*p * _alphaLevel);
         }
 
-        return &pmData;
+        return &_pixmap;
     }
 
 private:
@@ -243,7 +228,7 @@ private:
     const std::string _text;
     const std::string _font;
     const double _alphaLevel;
-    std::unordered_map<size_t, PixmapData> _pixmaps;
+    std::unordered_map<size_t, std::vector<unsigned char>> _pixmaps;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
