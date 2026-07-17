@@ -22,6 +22,12 @@
 #include <cmath>
 #include <unordered_map>
 
+namespace
+{
+    constexpr double watermark_size_multiplier = 1;
+    constexpr double text_box_ratio = 0.65;
+}
+
 class Watermark final
 {
 public:
@@ -47,8 +53,8 @@ public:
                    bool isSlideShowLayer = false)
     {
         // set requested watermark size a little bit smaller than tile size
-        const int width = tileWidth * 0.8;
-        const int height = tileHeight * 0.8;
+        const int width = tileWidth * watermark_size_multiplier;
+        const int height = tileHeight * watermark_size_multiplier;
 
         const std::vector<unsigned char>* pixmap = getPixmap(width, height);
 
@@ -120,11 +126,14 @@ private:
             return &_pixmaps[key];
         }
 
+        int textWidth = static_cast<int>(width * text_box_ratio);
+        int textHeight = static_cast<int>(height * text_box_ratio);
+
         // renderFont returns a buffer based on RGBA mode, where r, g, b
         // are always set to 0 (black) and the alpha level is 0 everywhere
         // except on the text area; the alpha level take into account of
         // performing anti-aliasing over the text edges.
-        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &width, &height, 0);
+        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &textWidth, &textHeight, 0);
 
         if (!textPixels)
         {
@@ -132,14 +141,29 @@ private:
             return nullptr;
         }
 
-        const unsigned int pixel_count = width * height * 4;
+        const unsigned int textPixelCount = static_cast<unsigned int>(textWidth) * textHeight * 4;
+        std::vector<unsigned char> smallText(textPixels, textPixels + textPixelCount);
+        std::free(textPixels); //todo check if needed
 
-        std::vector<unsigned char> text(textPixels, textPixels + pixel_count);
-        // No longer needed.
-        std::free(textPixels);
+        const unsigned int pixel_count = width * height * 4;
+        std::vector<unsigned char> text(pixel_count, 0);
+
 
         _pixmaps.emplace(key, std::vector<unsigned char>(pixel_count));
         std::vector<unsigned char>& _pixmap = _pixmaps[key];
+        const int offX = (width - textWidth) / 2;
+        const int offY = (height - textHeight) / 2;
+        for (int y = 0; y < textHeight; ++y)
+        {
+            for (int x = 0; x < textWidth; ++x)
+            {
+                const int dx = x + offX;
+                const int dy = y + offY;
+                if (dx < 0 || dx >= width || dy < 0 || dy >= height)
+                    continue;
+                std::memcpy(&text[4 * (dy * width + dx)], &smallText[4 * (y * textWidth + x)], 4);
+            }
+        }
 
         /*
             apply 2d rotation transformation (counter-clockwise):
