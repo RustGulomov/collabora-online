@@ -57,20 +57,20 @@ if [ ! -f poco/lib/libPocoFoundation.a ]; then
     cd ..
 fi
 
-##### core (LOKit) #####
+##### core (LOKit) — собираем из локальной engine/ #####
+if [ ! -d "$SOURCE_ROOT/engine" ] || [ -z "$(ls -A "$SOURCE_ROOT/engine" 2>/dev/null)" ]; then
+  echo "ERROR: engine/ submodule пуст. Выполните git submodule update --init --recursive"
+  exit 1
+fi
 
-# Мы используем pre-built assets (как в официальном Dockerfile)
-mkdir -p core
 (
-    cd core || exit 1
-    wget -O core-assets.tar.gz "$CORE_ASSETS"
-    tar -xzf core-assets.tar.gz
-    rm core-assets.tar.gz
+  cd "$SOURCE_ROOT/engine" || exit 1
+  ./autogen.sh --with-distro=CPLinux-LOKit --disable-epm --without-package-format --disable-symbols || exit 1
+  make $CORE_BUILD_TARGET || exit 1
 ) || exit 1
 
-# Копируем собранный lokit
 mkdir -p "$INSTDIR/opt/"
-cp -a core/instdir "$INSTDIR/opt/lokit"
+cp -a "$SOURCE_ROOT/engine/instdir" "$INSTDIR/opt/lokit"
 
 ##### coolwsd & cool (online часть) #####
 
