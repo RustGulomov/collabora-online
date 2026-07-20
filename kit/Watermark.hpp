@@ -22,17 +22,14 @@
 #include <cmath>
 #include <unordered_map>
 
+namespace
+{
+    constexpr double watermark_size_multiplier = 1;
+    constexpr double text_box_ratio = 0.65;
+}
+
 class Watermark final
 {
-    struct PixmapData
-    {
-        std::vector<unsigned char> pixels;
-        int width;
-        int height;
-        PixmapData() : width(0), height(0) {}
-        PixmapData(int w, int h) : pixels(w * h * 4), width(w), height(h) {}
-    };
-
 public:
     Watermark(const std::shared_ptr<lok::Document>& loKitDoc, const std::string& text,
               double opacity)
@@ -56,25 +53,21 @@ public:
                    bool isSlideShowLayer = false)
     {
         // set requested watermark size a little bit smaller than tile size
-        const int width = tileWidth * 0.8;
-        const int height = tileHeight * 0.8;
+        const int width = tileWidth * watermark_size_multiplier;
+        const int height = tileHeight * watermark_size_multiplier;
 
-        const PixmapData* pmData = getPixmap(width, height);
+        const std::vector<unsigned char>* pixmap = getPixmap(width, height);
 
-        if (pmData && tilePixmap)
+        if (pixmap && tilePixmap)
         {
-            // Use actual rendered dimensions for centering and blending
-            const int actualWidth = pmData->width;
-            const int actualHeight = pmData->height;
-
             // center watermark
-            const int maxX = std::min(tileWidth, actualWidth);
-            const int maxY = std::min(tileHeight, actualHeight);
+            const int maxX = std::min(tileWidth, width);
+            const int maxY = std::min(tileHeight, height);
             offsetX += (tileWidth - maxX) / 2;
             offsetY += (tileHeight - maxY) / 2;
-            alphaBlend(pmData->pixels, actualWidth, actualHeight, offsetX, offsetY,
+            alphaBlend(*pixmap, width, height, offsetX, offsetY,
                        tilePixmap, tilesPixmapWidth, tilesPixmapHeight,
-                       /*isFontBlending*/ false, isSlideShowLayer);
+                       /*isFontBlending*/ false,  isSlideShowLayer);
         }
     }
 
@@ -118,97 +111,8 @@ private:
             }
     }
 
-    /// Render multi-line watermark text by rendering each line separately
-    /// and composing them with proper inter-line spacing.
-    /// Sets width and height to the actual composed pixmap dimensions.
-    std::vector<unsigned char> renderMultiLineText(int& width, int& height)
-    {
-        // Split text into non-empty lines
-        std::vector<std::string> lines;
-        std::string::size_type start = 0;
-        std::string::size_type pos;
-        while ((pos = _text.find('\n', start)) != std::string::npos)
-        {
-            std::string line = _text.substr(start, pos - start);
-            if (!line.empty())
-                lines.push_back(std::move(line));
-            start = pos + 1;
-        }
-        if (start < _text.size())
-            lines.push_back(_text.substr(start));
-
-        if (lines.empty())
-            return {};
-
-        // Render each line separately at natural size (width=0, height=0
-        // triggers default font size) so that all lines share the same
-        // font metrics and the spacing between them is not compressed.
-        struct LinePixmap
-        {
-            std::vector<unsigned char> pixels;
-            int width;
-            int height;
-        };
-        std::vector<LinePixmap> rendered;
-        int maxWidth = 0;
-        int totalHeight = 0;
-        int lineSpacing = 0;
-
-        for (const auto& line : lines)
-        {
-            int w = 0, h = 0;
-            unsigned char* px = _loKitDoc->renderFont(_font.c_str(), line.c_str(), &w, &h, 0);
-            if (!px || w <= 0 || h <= 0)
-            {
-                std::free(px);
-                continue;
-            }
-            rendered.push_back({
-                std::vector<unsigned char>(px, px + w * h * 4), w, h
-            });
-            std::free(px);
-
-            maxWidth = std::max(maxWidth, w);
-            totalHeight += h;
-            if (lineSpacing == 0)
-                lineSpacing = std::max(1, static_cast<int>(h * 0.4));
-        }
-
-        if (rendered.empty())
-            return {};
-
-        // Add inter-line spacing
-        totalHeight += lineSpacing * (static_cast<int>(rendered.size()) - 1);
-
-        // Compose all lines into a single RGBA bitmap
-        width = maxWidth;
-        height = totalHeight;
-        std::vector<unsigned char> result(width * height * 4, 0);
-
-        int yOffset = 0;
-        for (const auto& rl : rendered)
-        {
-            for (int y = 0; y < rl.height && (y + yOffset) < height; ++y)
-            {
-                const int copyWidth = std::min(rl.width, width);
-                for (int x = 0; x < copyWidth; ++x)
-                {
-                    const int srcIdx = (y * rl.width + x) * 4;
-                    const int dstIdx = ((y + yOffset) * width + x) * 4;
-                    result[dstIdx + 0] = rl.pixels[srcIdx + 0];
-                    result[dstIdx + 1] = rl.pixels[srcIdx + 1];
-                    result[dstIdx + 2] = rl.pixels[srcIdx + 2];
-                    result[dstIdx + 3] = rl.pixels[srcIdx + 3];
-                }
-            }
-            yOffset += rl.height + lineSpacing;
-        }
-
-        return result;
-    }
-
     /// Create bitmap that we later use as the watermark for every tile.
-    const PixmapData* getPixmap(int width, int height)
+    const std::vector<unsigned char>* getPixmap(int width, int height)
     {
         if (_loKitDoc == nullptr)
         {
@@ -217,46 +121,49 @@ private:
 
         const size_t key = width + height * 10000;
 
-        auto it = _pixmaps.find(key);
-        if (it != _pixmaps.end())
+        if (_pixmaps.find(key) != _pixmaps.end())
         {
-            return &it->second;
+            return &_pixmaps[key];
         }
+
+        int textWidth = static_cast<int>(width * text_box_ratio);
+        int textHeight = static_cast<int>(height * text_box_ratio);
 
         // renderFont returns a buffer based on RGBA mode, where r, g, b
         // are always set to 0 (black) and the alpha level is 0 everywhere
         // except on the text area; the alpha level take into account of
         // performing anti-aliasing over the text edges.
-        std::vector<unsigned char> text;
-        if (_text.find('\n') != std::string::npos)
-        {
-            // Multi-line: render each line separately for proper spacing.
-            // Passing the full multi-line string to renderFont squeezes all
-            // lines into a constrained area with insufficient line spacing.
-            text = renderMultiLineText(width, height);
-        }
-        else
-        {
-            // Single-line: use renderFont directly with size constraints.
-            unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &width, &height, 0);
-            if (textPixels)
-            {
-                text.assign(textPixels, textPixels + width * height * 4);
-                std::free(textPixels);
-            }
-        }
+        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &textWidth, &textHeight, 0);
 
-        if (text.empty())
+        if (!textPixels)
         {
             LOG_ERR("Watermark: rendering failed.");
             return nullptr;
         }
 
-        const unsigned int pixel_count = width * height * 4;
+        const unsigned int textPixelCount = static_cast<unsigned int>(textWidth) * textHeight * 4;
+        std::vector<unsigned char> smallText(textPixels, textPixels + textPixelCount);
+        std::free(textPixels); //todo check if needed
 
-        _pixmaps.emplace(key, PixmapData(width, height));
-        PixmapData& pmData = _pixmaps[key];
-        std::vector<unsigned char>& _pixmap = pmData.pixels;
+        const unsigned int pixel_count = width * height * 4;
+        std::vector<unsigned char> text(pixel_count, 0);
+
+
+        _pixmaps.emplace(key, std::vector<unsigned char>(pixel_count));
+        std::vector<unsigned char>& _pixmap = _pixmaps[key];
+        const int offX = (width - textWidth) / 2;
+        const int offY = (height - textHeight) / 2;
+        for (int y = 0; y < textHeight; ++y)
+        {
+            for (int x = 0; x < textWidth; ++x)
+            {
+                const int dx = x + offX;
+                const int dy = y + offY;
+                if (dx < 0 || dx >= width || dy < 0 || dy >= height)
+                    continue;
+                std::memcpy(&text[4 * (dy * width + dx)], &smallText[4 * (y * textWidth + x)], 4);
+            }
+        }
 
         /*
             apply 2d rotation transformation (counter-clockwise):
@@ -337,7 +244,7 @@ private:
             *p = static_cast<unsigned char>(*p * _alphaLevel);
         }
 
-        return &pmData;
+        return &_pixmap;
     }
 
 private:
@@ -345,7 +252,7 @@ private:
     const std::string _text;
     const std::string _font;
     const double _alphaLevel;
-    std::unordered_map<size_t, PixmapData> _pixmaps;
+    std::unordered_map<size_t, std::vector<unsigned char>> _pixmaps;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

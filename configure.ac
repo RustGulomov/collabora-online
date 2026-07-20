@@ -274,6 +274,7 @@ AC_ARG_WITH([lo-builddir],
                             If you are building Android for a single ABI only, you may optionally specify only
                             the core for your ABI without any colons. In this case, providing an armeabi-v7a core
                             is not a requirement]))
+                            Server: defaults to $srcdir/engine if exists.
 
 AC_ARG_WITH([logfile],
             AS_HELP_STRING([--with-logfile=<path>],
@@ -808,6 +809,27 @@ AC_SUBST(ZSTDLIB_X86_64)
 AC_SUBST([CORE_VERSION_HASH])
 
 AC_DEFINE_UNQUOTED([CORE_VERSION_HASH],[["$CORE_VERSION_HASH"]],[LibreOffice core git hash if present])
+
+# For non-mobile/server builds, auto-detect engine from --with-lo-builddir,
+# defaulting to $srcdir/engine if that directory exists.
+if test "$enable_iosapp" != yes -a "$enable_androidapp" != yes -a "$host_os" != "emscripten"; then
+   if test -z "$with_lo_builddir" -a -d "$srcdir/engine"; then
+      with_lo_builddir="$srcdir/engine"
+      AC_MSG_NOTICE([using engine directory: $with_lo_builddir])
+   fi
+   if test -n "$with_lo_builddir"; then
+      LOBUILDDIR=`readlink -f "$with_lo_builddir"`
+      if test -z "$with_lokit_path"; then
+         with_lokit_path="$LOBUILDDIR/include"
+      fi
+      if test -z "$with_lo_path"; then
+         with_lo_path="$LOBUILDDIR/instdir"
+      fi
+   fi
+   if test -n "$with_lokit_path"; then
+      LOKIT_PATH=`readlink -f $with_lokit_path`
+   fi
+fi
 
 LIBPNG_INCLUDES="$with_libpng_includes"
 LIBPNG_LIBS="$with_libpng_libs"
