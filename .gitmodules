@@ -1,4 +1,4 @@
 [submodule "engine"]
 	path = engine
-	url = https://github.com/bibasmall/engine
+	url = https://github.com/RustGulomov/engine
 	branch = distro/collabora/co-24.04
