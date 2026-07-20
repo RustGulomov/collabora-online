@@ -82,7 +82,7 @@ cd "$SOURCE_ROOT" || exit 1
 
 ( ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
     --enable-silent-rules --disable-tests \
-    --with-lokit-path="$BUILDDIR/core/include" \
+    --with-lokit-path="$SOURCE_ROOT/engine/include" \
     --with-lo-path=/opt/lokit \
     --with-poco-includes="$BUILDDIR/poco/include" \
     --with-poco-libs="$BUILDDIR/poco/lib" \

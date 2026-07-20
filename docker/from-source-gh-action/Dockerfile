@@ -19,6 +19,7 @@ RUN --mount=type=cache,target=/var/cache/apt apt-get update && \
     libcap2-bin python3-lxml libpng-dev libcppunit-dev \
     pkg-config fontconfig snapd chromium-browser \
     rsync curl \
+    libkrb5-dev \
     # core build dependencies, only those that are needed for LOKit
     git build-essential zip ccache autoconf gperf nasm xsltproc flex bison
 
