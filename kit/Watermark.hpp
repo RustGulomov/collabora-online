@@ -21,18 +21,34 @@
 #include <string>
 #include <cmath>
 #include <unordered_map>
+#include <iostream>
 
 namespace
 {
-    constexpr double watermark_size_multiplier = 1;
-    constexpr double text_box_ratio = 0.65;
+    constexpr int GridPeriod = 2;
 }
 
 class Watermark final
 {
 public:
-    Watermark(const std::shared_ptr<lok::Document>& loKitDoc, const std::string& text,
-              double opacity)
+    struct TileParams
+    {
+        long tileTwipPosX;
+        long tileTwipPosY;
+        long tileTwipWidth;
+        long tileTwipHeight;
+        int tileWidth;
+        int tileHeight;
+        int offsetX;
+        int offsetY;
+    };
+
+    struct PixmapSet
+    {
+        std::array<std::vector<unsigned char>, GridPeriod * GridPeriod> fragments;
+    };
+
+    Watermark(const std::shared_ptr<lok::Document>& loKitDoc, const std::string& text, double opacity)
         : _loKitDoc(loKitDoc)
         , _text(Util::replace(text, "\\n", "\n"))
         , _font("Carlito")
@@ -53,8 +69,8 @@ public:
                    bool isSlideShowLayer = false)
     {
         // set requested watermark size a little bit smaller than tile size
-        const int width = tileWidth * watermark_size_multiplier;
-        const int height = tileHeight * watermark_size_multiplier;
+        const int width = tileWidth * 0.8;
+        const int height = tileHeight * 0.8;
 
         const std::vector<unsigned char>* pixmap = getPixmap(width, height);
 
@@ -66,6 +82,26 @@ public:
             offsetX += (tileWidth - maxX) / 2;
             offsetY += (tileHeight - maxY) / 2;
             alphaBlend(*pixmap, width, height, offsetX, offsetY,
+                       tilePixmap, tilesPixmapWidth, tilesPixmapHeight,
+                       /*isFontBlending*/ false,  isSlideShowLayer);
+        }
+    }
+
+    void blending2(unsigned char* tilePixmap, int tilesPixmapWidth, int tilesPixmapHeight, const TileParams& p,
+                  LibreOfficeKitTileMode /*mode*/, bool isSlideShowLayer = false)
+    {
+        //const long tileCol = p.tileTwipPosX / p.tileTwipWidth, tileRow = p.tileTwipPosY / p.tileTwipHeight;
+        if (p.tileTwipWidth <= 0 || p.tileTwipHeight <= 0 || p.tileTwipPosX < 0 || p.tileTwipPosY < 0 /*|| (tileCol % GridPeriod) || (tileRow % GridPeriod)*/)
+            return;
+
+        const int pixmapWidth = p.tileWidth * GridPeriod;
+        const int pixmapHeight = p.tileHeight * GridPeriod;
+
+        const std::vector<unsigned char>* pixmap = getPixmap2(pixmapWidth, pixmapHeight, p);
+
+        if (pixmap && tilePixmap)
+        {
+            alphaBlend(*pixmap, p.tileWidth, p.tileHeight, p.offsetX, p.offsetY,
                        tilePixmap, tilesPixmapWidth, tilesPixmapHeight,
                        /*isFontBlending*/ false,  isSlideShowLayer);
         }
@@ -126,14 +162,11 @@ private:
             return &_pixmaps[key];
         }
 
-        int textWidth = static_cast<int>(width * text_box_ratio);
-        int textHeight = static_cast<int>(height * text_box_ratio);
-
         // renderFont returns a buffer based on RGBA mode, where r, g, b
         // are always set to 0 (black) and the alpha level is 0 everywhere
         // except on the text area; the alpha level take into account of
         // performing anti-aliasing over the text edges.
-        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &textWidth, &textHeight, 0);
+        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &width, &height, 0);
 
         if (!textPixels)
         {
@@ -141,29 +174,14 @@ private:
             return nullptr;
         }
 
-        const unsigned int textPixelCount = static_cast<unsigned int>(textWidth) * textHeight * 4;
-        std::vector<unsigned char> smallText(textPixels, textPixels + textPixelCount);
-        std::free(textPixels); //todo check if needed
-
         const unsigned int pixel_count = width * height * 4;
-        std::vector<unsigned char> text(pixel_count, 0);
 
+        std::vector<unsigned char> text(textPixels, textPixels + pixel_count);
+        // No longer needed.
+        std::free(textPixels);
 
         _pixmaps.emplace(key, std::vector<unsigned char>(pixel_count));
         std::vector<unsigned char>& _pixmap = _pixmaps[key];
-        const int offX = (width - textWidth) / 2;
-        const int offY = (height - textHeight) / 2;
-        for (int y = 0; y < textHeight; ++y)
-        {
-            for (int x = 0; x < textWidth; ++x)
-            {
-                const int dx = x + offX;
-                const int dy = y + offY;
-                if (dx < 0 || dx >= width || dy < 0 || dy >= height)
-                    continue;
-                std::memcpy(&text[4 * (dy * width + dx)], &smallText[4 * (y * textWidth + x)], 4);
-            }
-        }
 
         /*
             apply 2d rotation transformation (counter-clockwise):
@@ -247,12 +265,158 @@ private:
         return &_pixmap;
     }
 
+    const std::vector<unsigned char>* getPixmap2(int width, int height, const TileParams& params)
+    {
+        if (_loKitDoc == nullptr)
+        {
+            return nullptr;
+        }
+
+        const size_t key = (static_cast<size_t>(width) << 32) | static_cast<uint32_t>(height);
+        const long tileCol = params.tileTwipPosX / params.tileTwipWidth;
+        const long tileRow = params.tileTwipPosY / params.tileTwipHeight;
+        int localRow = tileRow % GridPeriod;
+        int localCol = tileCol % GridPeriod;
+        int fragment = localRow * GridPeriod + localCol;
+
+        auto [it, inserted] = _pixmaps2.try_emplace(key);
+        if (!inserted)
+            return &it->second.fragments[fragment];
+
+        auto& fragments = it->second.fragments;
+
+        // renderFont returns a buffer based on RGBA mode, where r, g, b
+        // are always set to 0 (black) and the alpha level is 0 everywhere
+        // except on the text area; the alpha level take into account of
+        // performing anti-aliasing over the text edges.
+        unsigned char* textPixels = _loKitDoc->renderFont(_font.c_str(), _text.c_str(), &width, &height, 0);
+
+        if (!textPixels)
+        {
+            LOG_ERR("Watermark: rendering failed.");
+            return nullptr;
+        }
+        const unsigned int pixel_count = width * height * 4;
+        std::vector<unsigned char> text(textPixels, textPixels + pixel_count);
+        std::free(textPixels);
+        std::vector<unsigned char> multiTilesPixmap(pixel_count);
+
+        /*
+            apply 2d rotation transformation (counter-clockwise):
+            | cos(a) -sin(a) |  | x |
+            | sin(a)  cos(a) |  | y |
+        */
+        // Create the white blurred background
+        // Use box blur, it's enough for our purposes
+
+        // PI / 4 (45 degrees): sin = cos = 1/sqrt(2)
+        const double sin = 0.707106781186547524;
+        const double cos = sin;
+
+        const double x0 = width / 2.0;
+        const double y0 = height / 2.0;
+
+        std::vector<unsigned char> _rotatedText(pixel_count);
+
+        {
+            const int r = 2;
+            const double weight = (r+1) * (r+1);
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    // move origin to the center
+                    const double fx = x - x0;
+                    const double fy = y - y0;
+                    const int rX = (fx * cos) - (fy * sin) + x0;
+                    const int rY = (fx * sin) + (fy * cos) + y0;
+                    const unsigned int pos = 4 * (rY * width + rX);
+                    if (rX >= 0 && rX <= width && rY >= 0 && rY <= height && pos < text.size())
+                    {
+                        unsigned char* p = text.data() + 4 * (rY * width + rX);
+                        _rotatedText[4 * (y * width + x) + 0] = p[0];
+                        _rotatedText[4 * (y * width + x) + 1] = p[1];
+                        _rotatedText[4 * (y * width + x) + 2] = p[2];
+                        _rotatedText[4 * (y * width + x) + 3] = p[3];
+                    }
+                    else
+                    {
+                        _rotatedText[4 * (y * width + x) + 0] = 0.0;
+                        _rotatedText[4 * (y * width + x) + 1] = 0.0;
+                        _rotatedText[4 * (y * width + x) + 2] = 0.0;
+                        _rotatedText[4 * (y * width + x) + 3] = 0.0;
+                    }
+
+                    double t = 0;
+                    for (int ky = std::max(rY - r, 0); ky <= std::min(rY + r, height - 1); ++ky)
+                    {
+                        for (int kx = std::max(rX - r, 0); kx <= std::min(rX + r, width - 1); ++kx)
+                        {
+                            // Pre-multiplied alpha; the text is black, so all the
+                            // information is only in the alpha channel
+                            t += text[4 * (ky * width + kx) + 3];
+                        }
+                    }
+
+                    // Clamp the result.
+                    double avg = t / weight;
+                    if (avg > 255.0)
+                        avg = 255.0;
+
+                    // Pre-multiplied alpha, but use white for the resulting color
+                    const double alpha = avg / 255.0;
+                    multiTilesPixmap[4 * (y * width + x) + 0] = 0xff * alpha;
+                    multiTilesPixmap[4 * (y * width + x) + 1] = 0xff * alpha;
+                    multiTilesPixmap[4 * (y * width + x) + 2] = 0xff * alpha;
+                    multiTilesPixmap[4 * (y * width + x) + 3] = avg;
+                }
+            }
+        }
+
+        // Now copy the (black) text over the (white) blur
+        alphaBlend(_rotatedText, width, height, 0, 0, multiTilesPixmap.data(), width, height, true);
+
+        // Make the resulting pixmap semi-transparent
+        for (unsigned char* p = multiTilesPixmap.data(); p < multiTilesPixmap.data() + pixel_count; p++)
+        {
+            *p = static_cast<unsigned char>(*p * _alphaLevel);
+        }
+
+        const int tileW = width / GridPeriod;
+        const int tileH = height / GridPeriod;
+
+        for (int r = 0; r < GridPeriod; ++r)
+        {
+            for (int c = 0; c < GridPeriod; ++c)
+            {
+                auto& tile = fragments[r * GridPeriod + c];
+                tile.resize(tileW * tileH * 4);
+
+                const int cropX = static_cast<int>(c) * tileW;
+                const int cropY = static_cast<int>(r) * tileH;
+
+                for (int y = 0; y < tileH; ++y)
+                {
+                    const unsigned char* srcRow = multiTilesPixmap.data() + 4 * ((cropY + y) * width + cropX);
+                    unsigned char* dstRow = tile.data() + 4 * (y * tileW);
+                    std::memcpy(dstRow, srcRow, tileW * 4);
+                }
+
+                const size_t tileKey = r * GridPeriod + c;
+                std::cerr << "CREATED KEY: " << tileKey << std::endl;
+            }
+        }
+
+        return &it->second.fragments[fragment];
+    }
+
 private:
     const std::shared_ptr<lok::Document> _loKitDoc;
     const std::string _text;
     const std::string _font;
     const double _alphaLevel;
     std::unordered_map<size_t, std::vector<unsigned char>> _pixmaps;
+    std::unordered_map<size_t, PixmapSet> _pixmaps2;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

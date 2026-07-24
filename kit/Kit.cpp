@@ -990,11 +990,20 @@ void Document::renderTiles(TileCombined &tileCombined)
         _loKitDocument->setView(session->getViewId());
 
     const auto blenderFunc = [&](unsigned char* data, int offsetX, int offsetY,
-                                 std::size_t pixmapWidth, std::size_t pixmapHeight,
-                                 int pixelWidth, int pixelHeight, LibreOfficeKitTileMode mode) {
+                                 std::size_t tilesPixmapWidth, std::size_t tilesPixmapHeight,
+                                 int pixelWidth, int pixelHeight, LibreOfficeKitTileMode mode,
+                                 long tilePosX, long tilePosY, long tileTwipWidth, long tileTwipHeight) {
         if (session->watermark())
-            session->watermark()->blending(data, offsetX, offsetY, pixmapWidth, pixmapHeight,
-                                           pixelWidth, pixelHeight, mode);
+            session->watermark()->blending2(data, tilesPixmapWidth, tilesPixmapHeight,
+                                            Watermark::TileParams{.tileTwipPosX = tilePosX,
+                                                                  .tileTwipPosY = tilePosY,
+                                                                  .tileTwipWidth = tileTwipWidth,
+                                                                  .tileTwipHeight = tileTwipHeight,
+                                                                  .tileWidth = pixelWidth,
+                                                                  .tileHeight = pixelHeight,
+                                                                  .offsetX = offsetX,
+                                                                  .offsetY = offsetY},
+                                                                  mode);
     };
 
     const auto postMessageFunc = [&](const char* buffer, std::size_t length) {
