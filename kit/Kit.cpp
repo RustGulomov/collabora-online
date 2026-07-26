@@ -995,15 +995,10 @@ void Document::renderTiles(TileCombined &tileCombined)
                                  long tilePosX, long tilePosY, long tileTwipWidth, long tileTwipHeight) {
         if (session->watermark())
             session->watermark()->blending2(data, tilesPixmapWidth, tilesPixmapHeight,
-                                            Watermark::TileParams{.tileTwipPosX = tilePosX,
-                                                                  .tileTwipPosY = tilePosY,
-                                                                  .tileTwipWidth = tileTwipWidth,
-                                                                  .tileTwipHeight = tileTwipHeight,
-                                                                  .tileWidth = pixelWidth,
-                                                                  .tileHeight = pixelHeight,
-                                                                  .offsetX = offsetX,
-                                                                  .offsetY = offsetY},
-                                                                  mode);
+                                            Watermark::TileParams{.twipPosX = tilePosX, .twipPosY = tilePosY,
+                                                                    .twipWidth = tileTwipWidth, .twipHeight = tileTwipHeight,
+                                                                    .width = pixelWidth, .height = pixelHeight,
+                                                                    .offsetX = offsetX, .offsetY = offsetY}, mode);
     };
 
     const auto postMessageFunc = [&](const char* buffer, std::size_t length) {
