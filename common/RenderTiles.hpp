@@ -69,7 +69,8 @@ namespace RenderTiles
         TileCombined& tileCombined, ThreadPool& pngPool,
         const std::function<void(unsigned char* data, int offsetX, int offsetY, size_t pixmapWidth,
                                  size_t pixmapHeight, int pixelWidth, int pixelHeight,
-                                 LibreOfficeKitTileMode mode)>& blendWatermark,
+                                 LibreOfficeKitTileMode mode,
+                                 long tilePosX, long tilePosY, long tileTwipWidth, long tileTwipHeight)>& blendWatermark,
         const std::function<void(const char* buffer, size_t length)>& outputMessage,
         [[maybe_unused]] unsigned mobileAppDocId, CanonicalViewId canonicalViewId, bool dumpTiles)
     {
@@ -161,7 +162,8 @@ namespace RenderTiles
             blendWatermark(pixmap.data(), offsetX, offsetY,
                            pixmapWidth, pixmapHeight,
                            pixelWidth, pixelHeight,
-                           mode);
+                           mode,
+                           tileRect.getLeft(), tileRect.getTop(), tileCombined.getTileWidth(), tileCombined.getTileHeight());
 
             // FIXME: prettify this.
             bool forceKeyframe = tiles[tileIndex].isForcedKeyFrame();
