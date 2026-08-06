@@ -107,7 +107,7 @@
         <file enable="@COOLWSD_LOG_TO_FILE@">
             <!-- If you use other path than /var/log and you run coolwsd from systemd, make sure that you enable that path in coolwsd.service (ReadWritePaths). Also the log file path must be writable by the 'cool' user. -->
             <property name="path" desc="Log file path.">@COOLWSD_LOGFILE@</property>
-            <property name="rotation" desc="Log file rotation strategy. See Poco FileChannel.">never</property>
+            <property name="rotation" desc="Log file rotation strategy. See Poco FileChannel.">1 days</property>
             <property name="archive" desc="Append either timestamp or number to the archived log filename.">timestamp</property>
             <property name="compress" desc="Enable/disable log file compression.">true</property>
             <property name="purgeAge" desc="The maximum age of log files to preserve. See Poco FileChannel.">10 days</property>
@@ -258,6 +258,7 @@
     <user_interface>
       <mode type="string" desc="Controls the user interface style. The 'default' means: Take the value from ui_defaults, or decide for one of compact or tabbed (default|compact|tabbed)" default="default">default</mode>
       <use_integration_theme desc="Use theme from the integrator" type="bool" default="true">true</use_integration_theme>
+      <ui_defaults desc="Applied when no saved UI state exists and are overridden by the ui_defaults request parameter if present." type="string">SpreadsheetSidebar=false;TextSidebar=false;PresentationSidebar=false;DrawingSidebar=false;UITheme=light</ui_defaults>
       <statusbar_save_indicator desc="Show saving status indicator in the statusbar" type="bool" default="true">true</statusbar_save_indicator>
 
       @CONFIG_INTERFACE_FRAGMENT@
