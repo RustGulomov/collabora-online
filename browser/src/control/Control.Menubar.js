@@ -647,8 +647,8 @@ L.Control.Menubar = L.Control.extend({
 					{name: _UNO('.uno:InsertPageField', 'presentation'), uno: '.uno:InsertPageField'},
 					{name: _UNO('.uno:InsertPageTitleField', 'presentation'), uno: '.uno:InsertPageTitleField'},
 					{name: _UNO('.uno:InsertPagesField', 'presentation'), uno: '.uno:InsertPagesField'},
-				]},
-				{name: _UNO('.uno:InsertSignatureLine'), id: 'insert-signatureline', type: 'action'},
+				]}/*,
+				{name: _UNO('.uno:InsertSignatureLine'), id: 'insert-signatureline', type: 'action'},*/
 			]},
 			{name: _UNO('.uno:FormatMenu', 'presentation'), id: 'format', type: 'menu', menu: [
 				{uno: '.uno:FontDialog'},
