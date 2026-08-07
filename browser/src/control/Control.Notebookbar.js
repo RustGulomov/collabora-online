@@ -74,23 +74,23 @@ L.Control.Notebookbar = L.Control.extend({
 		$('.main-nav').addClass('hasnotebookbar');
 		document.getElementById('document-container').classList.add('notebookbar-active');
 
-		var docLogoHeader = L.DomUtil.create('div', '');
-		docLogoHeader.id = 'document-header';
+		// var docLogoHeader = L.DomUtil.create('div', '');
+		// docLogoHeader.id = 'document-header';
 
-		var iconClass = 'document-logo';
-		if (docType === 'text') {
-			iconClass += ' writer-icon-img';
-		} else if (docType === 'spreadsheet') {
-			iconClass += ' calc-icon-img';
-		} else if (docType === 'presentation') {
-			iconClass += ' impress-icon-img';
-		} else if (docType === 'drawing') {
-			iconClass += ' draw-icon-img';
-		}
-		var docLogo = L.DomUtil.create('div', iconClass, docLogoHeader);
-		$(docLogo).data('id', 'document-logo');
-		$(docLogo).data('type', 'action');
-		$('.main-nav').prepend(docLogoHeader);
+		// var iconClass = 'document-logo';
+		// if (docType === 'text') {
+		// 	iconClass += ' writer-icon-img';
+		// } else if (docType === 'spreadsheet') {
+		// 	iconClass += ' calc-icon-img';
+		// } else if (docType === 'presentation') {
+		// 	iconClass += ' impress-icon-img';
+		// } else if (docType === 'drawing') {
+		// 	iconClass += ' draw-icon-img';
+		// }
+		// var docLogo = L.DomUtil.create('div', iconClass, docLogoHeader);
+		// $(docLogo).data('id', 'document-logo');
+		// $(docLogo).data('type', 'action');
+		// $('.main-nav').prepend(docLogoHeader);
 		var isDarkMode = window.prefs.getBoolean('darkTheme');
 		if (!isDarkMode)
 			$('#invertbackground').hide();

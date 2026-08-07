@@ -559,6 +559,10 @@ nav.hasnotebookbar #save.saved::after {
 	background-color: white !important;
 }
 
+#document-name-input {
+	color: white !important;
+}
+
 #main-menu #menu-editmenu,
 #main-menu #menu-format,
 #main-menu #menu-references,
@@ -649,84 +653,98 @@ nav.hasnotebookbar #save.saved::after {
 	color: white !important;
 }
 
-#menu-toggledarktheme {
+/* .main-nav.hasnotebookbar #closebuttonwrapper {
+	display: none !important;
+} */
+
+/* #menu-toggledarktheme {
 	display: none !important;
 }
 .notebookbar .unotoggledarktheme {
 	display: none !important;
-}
-.main-nav.hasnotebookbar #document-header {
+} */
+/* .main-nav.hasnotebookbar #document-header {
 	display: none !important;
-}
-#Help-tab-label {
+} */
+/* #Help-tab-label {
 	display: none !important;
-}
-#menu-help {
+} */
+/* #menu-help {
 	display: none !important;
-}
-#fullscreen {
+} */
+/* #fullscreen {
 	display: none !important;
-}
-#view-presentation-in-window {
+} */
+/* #view-presentation-in-window {
 	display: none !important;
-}
-#view-presentation {
+} */
+/* does nothing. removed 'id': 'view-presentation:Presentation' instead*/
+/* #view-presentation {
 	display: none !important;
-}
-#presentation {
+} */
+/* #presentation {
 	display: none !important;
-}
-#menu-present-in-window {
+} */
+/* #menu-present-in-window {
 	display: none !important;
-}
-#menu-presentation-currentslide {
+} */
+/* #menu-presentation-currentslide {
 	display: none !important;
-}
-#renamedocument { /* VLT-4001 Убрать кнопку переименования */
+} */
+/* VLT-4001 Убрать кнопку переименования */
+/* #renamedocument {
 	display: none !important;
-}
-#menu-savecomments {
+} */
+/* #menu-savecomments {
 	display: none !important;
-}
-#menu-fullscreen {
+} */
+/* seems useless */
+/* #menu-fullscreen {
 	display: none !important;
-}
-#menu-fullscreen + li {
+} */
+/* seems useless */
+/* #menu-fullscreen + li {
 	display: none !important;
-}
-#menu-renamedocument { /* VLT-4001 Убрать кнопку переименования */
+} */
+/* seems useless */ /* VLT-4001 Убрать кнопку переименования */
+/* #menu-renamedocument {
 	display: none !important;
-}
-.main-nav.hasnotebookbar #closebuttonwrapper {
+} */
+/* VLT-4224 */
+/* #downloadas {
 	display: none !important;
-}
-#downloadas { /* VLT-4224 */
+} */
+/* VLT-4224 */ /* seems useless */
+/* #menu-downloadas {
 	display: none !important;
-}
-#menu-downloadas { /* VLT-4224 */
+} */
+/* VLT-4321 Убрать кнопку signature line */
+/* #signature {
 	display: none !important;
-}
-#signature { /* VLT-4321 Убрать кнопку signature line */
+} */
+/* VLT-4321 */
+/* #menu-signature {
 	display: none !important;
-}
-#menu-signature { /* VLT-4321 */
+} */
+/* VLT-4321 */ /* seems useless */
+/* #menu-insert-signatureline {
 	display: none !important;
-}
-#menu-insert-signatureline { /* VLT-4321 */
+} */
+/* looks useless */
+/* #large_copy_paste_warning p:last-child {
 	display: none !important;
-}
-#large_copy_paste_warning p:last-child {
+} */
+/* looks useless */
+/* .iframe-welcome-wrap {
 	display: none !important;
-}
-.iframe-welcome-wrap {
-	display: none !important;
-}
+} */
 form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container {
 	display: none !important;
 }
-.leaflet-container.leaflet-progress-layer.brand-label {
+/* looks useless */
+/* .leaflet-container.leaflet-progress-layer.brand-label {
 	display: none !important;
-}
+} */
 .ui-header:has(.fullscreen) {
 	display: none !important;
 }
@@ -742,34 +760,40 @@ form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container
 .ui-header:has(.downloadas) {
 	display: none !important;
 }
-#menu-runmacro { /* VLT-4869 */
+/* VLT-4869 */ /* looks useless */
+/* #menu-runmacro {
 	display: none !important;
-}
-#document-header:has(.document-logo) {
+} */
+/* #document-header:has(.document-logo) {
 	display: none !important;
-}
-#closebutton {
+} */
+/* #closebutton {
 	display: none !important;
-}
-.unoRunMacro { /* VLT-4869 Скрыть выполнить макрос в коллаборе */
+} */
+/* VLT-4869 Скрыть выполнить макрос в коллаборе */
+/* .unoRunMacro {
 	display: none !important;
-}
+} */
 .jsdialog.ui-button-box-right:has(#modal-dialog-switch-to-edit-mode-modal-nobutton)
 .d-flex.justify-content-center:has(#modal-dialog-switch-to-edit-mode-modal-yesbutton) {
 	display: none !important;
 }
-#file-saveas { /* 4993 Скрытие "Сохранить как" и "Экспортировать как" */
+/* 4993 Скрытие "Сохранить как" и "Экспортировать как" */
+/* #file-saveas {
 	display: none !important;
-}
-#exportas { /* 4993 */
+} */
+/* 4993 */
+/* #menu-saveas {
 	display: none !important;
-}
-#menu-saveas { /* 4993 */
+} */
+/* 4993 */
+/* #exportas {
 	display: none !important;
-}
-#menu-exportas { /* 4993 */
+} */
+/*seems useless*/ /* 4993 */
+/* #menu-exportas {
 	display: none !important;
-}
+} */
 @media all and (max-width: 767px) {
 	.ui-header:has(.defineprintarea) {
 		display: none !important;
@@ -778,6 +802,7 @@ form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container
 		display: none !important;
 	}
 }
-.brand-label { /* disableIframePrintDisplay() */
+/* disableIframePrintDisplay() */
+/* .brand-label {
 	display: none !important;
-}
+} */

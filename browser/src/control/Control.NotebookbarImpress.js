@@ -155,13 +155,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				'text': _('View'),
 				'name': 'View',
 				'accessibility': { focusBack: false, combination: 'W', de: null }
-			},
-			{
-				'id': 'Help-tab-label',
-				'text': _('Help'),
-				'name': 'Help',
-				'accessibility': { focusBack: false, combination: 'Y', de: null }
-			}
+			}//,
+			// {
+			// 	'id': 'Help-tab-label',
+			// 	'text': _('Help'),
+			// 	'name': 'Help',
+			// 	'accessibility': { focusBack: false, combination: 'Y', de: null }
+			// }
 		];
 	},
 
@@ -177,7 +177,7 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 			this.getDrawTab(),
 			this.getMasterTab(),
 			this.getViewTab(),
-			this.getHelpTab()
+			// this.getHelpTab()
 		];
 	},
 
@@ -204,38 +204,38 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 			});
 		}
 
-		if (!this.map['wopi'].UserCanNotWriteRelative) {
-			content.push(
-				(window.prefs.get('saveAsMode') === 'group') ?
-				{
-					'id': 'saveas:SaveAsMenu',
-					'command': 'saveas',
-					'class': 'unosaveas',
-					'type': 'exportmenubutton',
-					'text': _('Save As'),
-					'accessibility': { focusBack: true, combination: 'SA', de: null }
-				}:
-				{
-					'id': 'file-saveas',
-					'type': 'bigtoolitem',
-					'text': _UNO('.uno:SaveAs', 'presentation'),
-					'command': '.uno:SaveAs',
-					'accessibility': { focusBack: true, combination: 'SA', de: null }
-				}
-			);
-		}
+		// if (!this.map['wopi'].UserCanNotWriteRelative) {
+		// 	content.push(
+		// 		(window.prefs.get('saveAsMode') === 'group') ?
+		// 		{
+		// 			'id': 'saveas:SaveAsMenu',
+		// 			'command': 'saveas',
+		// 			'class': 'unosaveas',
+		// 			'type': 'exportmenubutton',
+		// 			'text': _('Save As'),
+		// 			'accessibility': { focusBack: true, combination: 'SA', de: null }
+		// 		}:
+		// 		{
+		// 			'id': 'file-saveas',
+		// 			'type': 'bigtoolitem',
+		// 			'text': _UNO('.uno:SaveAs', 'presentation'),
+		// 			'command': '.uno:SaveAs',
+		// 			'accessibility': { focusBack: true, combination: 'SA', de: null }
+		// 		}
+		// 	);
+		// }
 
-		if (!this.map['wopi'].UserCanNotWriteRelative) {
-			content.push(
-			{
-				'id': 'exportas:ExportAsMenu',
-				'command': 'exportas',
-				'class': 'unoexportas',
-				'type': 'exportmenubutton',
-				'text': _('Export As'),
-				'accessibility': { focusBack: true, combination: 'EA', de: null }
-			});
-		}
+		// if (!this.map['wopi'].UserCanNotWriteRelative) {
+		// 	content.push(
+		// 	{
+		// 		'id': 'exportas:ExportAsMenu',
+		// 		'command': 'exportas',
+		// 		'class': 'unoexportas',
+		// 		'type': 'exportmenubutton',
+		// 		'text': _('Export As'),
+		// 		'accessibility': { focusBack: true, combination: 'EA', de: null }
+		// 	});
+		// }
 
 		content.push(
 			{
@@ -333,31 +333,31 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					}
 				]
 		});
-		if (window.documentSigningEnabled) {
-			content.push({
-				'type': 'container',
-				'children': [
-					{
-						'id': 'signature',
-						'type': 'bigtoolitem',
-						'text': _('Signature'),
-						'command': '.uno:Signature',
-						'accessibility': { focusBack: true, combination: 'SN' }
-					}
-				]
-			});
-		}
+		// if (window.documentSigningEnabled) {
+		// 	content.push({
+		// 		'type': 'container',
+		// 		'children': [
+		// 			{
+		// 				'id': 'signature',
+		// 				'type': 'bigtoolitem',
+		// 				'text': _('Signature'),
+		// 				'command': '.uno:Signature',
+		// 				'accessibility': { focusBack: true, combination: 'SN' }
+		// 			}
+		// 		]
+		// 	});
+		// }
 		if (this._map['wopi']._supportsRename() && this._map['wopi'].UserCanRename) {
 			content.push(
 				{
 					'type': 'container',
 					'children': [
-						{
-							'id': 'renamedocument',
-							'class': 'unoRenameDocument',
-							'type': 'bigcustomtoolitem',
-							'text': _('Rename'),
-						}
+						// {
+						// 	'id': 'renamedocument',
+						// 	'class': 'unoRenameDocument',
+						// 	'type': 'bigcustomtoolitem',
+						// 	'text': _('Rename'),
+						// }
 					]
 				}
 			);
@@ -375,22 +375,22 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					'text': _('Read mode'),
 					'command': 'closetablet'
 				} : {},
-			{
-				'id': 'view-presentation:Presentation',
-				'class': 'unoPresentation',
-				'type': 'menubutton',
-				'text': _('Presentation'),
-				'command': 'presentation',
-				'accessibility': { focusBack: true, combination: 'PR', de: null }
-			},
-			!window.ThisIsAMobileApp ?
-				{
-					'id': 'view-presentation-in-window',
-					'type': 'bigcustomtoolitem',
-					'text': _('Present in Window'),
-					'command': 'presentinwindow',
-					'accessibility': { focusBack: true, combination: 'PW', de: null }
-				} : {},
+			// {
+			// 	'id': 'view-presentation:Presentation',
+			// 	'class': 'unoPresentation',
+			// 	'type': 'menubutton',
+			// 	'text': _('Presentation'),
+			// 	'command': 'presentation',
+			// 	'accessibility': { focusBack: true, combination: 'PR', de: null }
+			// },
+			// !window.ThisIsAMobileApp ?
+			// 	{
+			// 		'id': 'view-presentation-in-window',
+			// 		'type': 'bigcustomtoolitem',
+			// 		'text': _('Present in Window'),
+			// 		'command': 'presentinwindow',
+			// 		'accessibility': { focusBack: true, combination: 'PW', de: null }
+			// 	} : {},
 			!window.ThisIsAMobileApp && window.canvasSlideshowEnabled ?
 			        {
 					'id': 'view-presentation-in-console',
@@ -399,13 +399,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 					'command': 'presenterconsole',
 					'accessibility': { focusBack: true, combination: 'PW', de: null }
 				}: {},
-			{
-				'id': 'fullscreen',
-				'type': 'bigtoolitem',
-				'text': _UNO('.uno:FullScreen'),
-				'command': '.uno:FullScreen',
-				'accessibility': { focusBack: true, combination: 'FS', de: null }
-			},
+			// {
+			// 	'id': 'fullscreen',
+			// 	'type': 'bigtoolitem',
+			// 	'text': _UNO('.uno:FullScreen'),
+			// 	'command': '.uno:FullScreen',
+			// 	'accessibility': { focusBack: true, combination: 'FS', de: null }
+			// },
 			{
 				'id': 'zoomreset',
 				'class': 'unozoomreset',
@@ -521,13 +521,13 @@ L.Control.NotebookbarImpress = L.Control.NotebookbarWriter.extend({
 				],
 				'vertical': 'true'
 			},
-			{
-				'id':'toggledarktheme',
-				'class': 'unotoggledarktheme',
-				'type': 'bigcustomtoolitem',
-				'text': _('Dark Mode'),
-				'accessibility': { focusBack: true, combination: 'TT', de: null }
-			},
+			// {
+			// 	'id':'toggledarktheme',
+			// 	'class': 'unotoggledarktheme',
+			// 	'type': 'bigcustomtoolitem',
+			// 	'text': _('Dark Mode'),
+			// 	'accessibility': { focusBack: true, combination: 'TT', de: null }
+			// },
 			{
 				'id':'invertbackground',
 				'class': 'unoinvertbackground',
