@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: set global env
         id: global_env
@@ -33,6 +35,8 @@ jobs:
           file: docker/from-source-gh-action/Dockerfile
           tags: |
             ${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}
+          build-args: |
+            CORE_BRANCH=vaulterix/co-24.04
 
       - name: Docker Registry login
         uses: docker/login-action@v3
