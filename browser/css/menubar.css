@@ -653,10 +653,40 @@ nav.hasnotebookbar #save.saved::after {
 	color: white !important;
 }
 
+form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container {
+	display: none !important;
+}
+.ui-header:has(.fullscreen) {
+	display: none !important;
+}
+.ui-header:has(.latestupdates) {
+	display: none !important;
+}
+.ui-header:has(.feedback) {
+	display: none !important;
+}
+.ui-header:has(.about) {
+	display: none !important;
+}
+.ui-header:has(.downloadas) {
+	display: none !important;
+}
+.jsdialog.ui-button-box-right:has(#modal-dialog-switch-to-edit-mode-modal-nobutton)
+.d-flex.justify-content-center:has(#modal-dialog-switch-to-edit-mode-modal-yesbutton) {
+	display: none !important;
+}
+@media all and (max-width: 767px) {
+	.ui-header:has(.defineprintarea) {
+		display: none !important;
+	}
+	.ui-header:has(.deleteprintarea) {
+		display: none !important;
+	}
+}
+
 /* .main-nav.hasnotebookbar #closebuttonwrapper {
 	display: none !important;
 } */
-
 /* #menu-toggledarktheme {
 	display: none !important;
 }
@@ -738,28 +768,10 @@ nav.hasnotebookbar #save.saved::after {
 /* .iframe-welcome-wrap {
 	display: none !important;
 } */
-form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container {
-	display: none !important;
-}
 /* looks useless */
 /* .leaflet-container.leaflet-progress-layer.brand-label {
 	display: none !important;
 } */
-.ui-header:has(.fullscreen) {
-	display: none !important;
-}
-.ui-header:has(.latestupdates) {
-	display: none !important;
-}
-.ui-header:has(.feedback) {
-	display: none !important;
-}
-.ui-header:has(.about) {
-	display: none !important;
-}
-.ui-header:has(.downloadas) {
-	display: none !important;
-}
 /* VLT-4869 */ /* looks useless */
 /* #menu-runmacro {
 	display: none !important;
@@ -774,10 +786,6 @@ form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container
 /* .unoRunMacro {
 	display: none !important;
 } */
-.jsdialog.ui-button-box-right:has(#modal-dialog-switch-to-edit-mode-modal-nobutton)
-.d-flex.justify-content-center:has(#modal-dialog-switch-to-edit-mode-modal-yesbutton) {
-	display: none !important;
-}
 /* 4993 Скрытие "Сохранить как" и "Экспортировать как" */
 /* #file-saveas {
 	display: none !important;
@@ -794,14 +802,6 @@ form.snackbar.jsdialog-container.ui-dialog.ui-widget-content.lokdialog_container
 /* #menu-exportas {
 	display: none !important;
 } */
-@media all and (max-width: 767px) {
-	.ui-header:has(.defineprintarea) {
-		display: none !important;
-	}
-	.ui-header:has(.deleteprintarea) {
-		display: none !important;
-	}
-}
 /* disableIframePrintDisplay() */
 /* .brand-label {
 	display: none !important;
