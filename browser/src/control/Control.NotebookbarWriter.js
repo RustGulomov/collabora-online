@@ -100,13 +100,13 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 				'id': viewTabName + '-tab-label',
 				'name': viewTabName,
 				'accessibility': { focusBack: true, combination: 'W', de: 'F' }
-			},
-			{
-				'text': _('Help'),
-				'id': helpTabName + '-tab-label',
-				'name': helpTabName,
-				'accessibility': { focusBack: true, combination: 'Y', de: 'E' }
-			}
+			}//,
+			// {
+			// 	'text': _('Help'),
+			// 	'id': helpTabName + '-tab-label',
+			// 	'name': helpTabName,
+			// 	'accessibility': { focusBack: true, combination: 'Y', de: 'E' }
+			// }
 		];
 	},
 
@@ -123,7 +123,7 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 			this.getTableTab(),
 			this.getDrawTab(),
 			this.getViewTab(),
-			this.getHelpTab()
+			// this.getHelpTab()
 		]
 	},
 
@@ -135,10 +135,10 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 		var hasRevisionHistory = L.Params.revHistoryEnabled;
 		var hasPrint = !this.map['wopi'].HidePrintOption;
 		var hasRepair = !this.map['wopi'].HideRepairOption;
-		var hasSaveAs = !this.map['wopi'].UserCanNotWriteRelative;
+		//var hasSaveAs = !this.map['wopi'].UserCanNotWriteRelative;
 		var hasShare = this.map['wopi'].EnableShare;
 		var hideDownload = this.map['wopi'].HideExportOption;
-		var hasGroupedSaveAs = window.prefs.get('saveAsMode') === 'group';
+		//var hasGroupedSaveAs = window.prefs.get('saveAsMode') === 'group';
 		var hasRunMacro = window.enableMacrosExecution;
 		var hasSave = !this.map['wopi'].HideSaveOption;
 		var content = [];
@@ -158,36 +158,36 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 			});
 		}
 
-		if (hasSaveAs) {
-			if (hasGroupedSaveAs) {
-				content.push({
-					'id': 'saveas:SaveAsMenu',
-					'command': 'saveas',
-					'type': 'exportmenubutton',
-					'text': _('Save As'),
-					'accessibility': { focusBack: true,	combination: 'SA' }
-				});
-			} else {
-				content.push({
-					'id': 'file-saveas',
-					'type': 'bigtoolitem',
-					'text': _UNO('.uno:SaveAs', 'text'),
-					'command': '.uno:SaveAs',
-					'accessibility': { focusBack: true,	combination: 'SA' }
-				});
-			}
-		}
+		// if (hasSaveAs) {
+		// 	if (hasGroupedSaveAs) {
+		// 		content.push({
+		// 			'id': 'saveas:SaveAsMenu',
+		// 			'command': 'saveas',
+		// 			'type': 'exportmenubutton',
+		// 			'text': _('Save As'),
+		// 			'accessibility': { focusBack: true,	combination: 'SA' }
+		// 		});
+		// 	} else {
+		// 		content.push({
+		// 			'id': 'file-saveas',
+		// 			'type': 'bigtoolitem',
+		// 			'text': _UNO('.uno:SaveAs', 'text'),
+		// 			'command': '.uno:SaveAs',
+		// 			'accessibility': { focusBack: true,	combination: 'SA' }
+		// 		});
+		// 	}
+		// }
 
-		if (hasSaveAs) {
-			content.push({
-				'id': 'exportas:ExportAsMenu',
-				'command': 'exportas',
-				'class': 'unoexportas',
-				'type': 'exportmenubutton',
-				'text': _('Export As'),
-				'accessibility': { focusBack: true,	combination: 'EA' }
-			});
-		}
+		// if (hasSaveAs) {
+		// 	content.push({
+		// 		'id': 'exportas:ExportAsMenu',
+		// 		'command': 'exportas',
+		// 		'class': 'unoexportas',
+		// 		'type': 'exportmenubutton',
+		// 		'text': _('Export As'),
+		// 		'accessibility': { focusBack: true,	combination: 'EA' }
+		// 	});
+		// }
 
 		if (hasShare && hasRevisionHistory) {
 			content.push(
@@ -260,12 +260,12 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 			{
 				'type': 'toolbox',
 				'children': [
-					{
-						'id': 'runmacro',
-						'type': 'bigtoolitem',
-						'text': _UNO('.uno:RunMacro', 'text'),
-						'command': '.uno:RunMacro'
-					}
+					// {
+					// 	'id': 'runmacro',
+					// 	'type': 'bigtoolitem',
+					// 	'text': _UNO('.uno:RunMacro', 'text'),
+					// 	'command': '.uno:RunMacro'
+					// }
 				]
 			});
 		}
@@ -310,32 +310,32 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 					}
 				]
 		});
-		if (window.documentSigningEnabled) {
-			content.push({
-				'type': 'container',
-				'children': [
-					{
-						'id': 'signature',
-						'type': 'bigtoolitem',
-						'text': _('Signature'),
-						'command': '.uno:Signature',
-						'accessibility': { focusBack: true, combination: 'SN' }
-					}
-				]
-			});
-		}
+		// if (window.documentSigningEnabled) {
+		// 	content.push({
+		// 		'type': 'container',
+		// 		'children': [
+		// 			{
+		// 				'id': 'signature',
+		// 				'type': 'bigtoolitem',
+		// 				'text': _('Signature'),
+		// 				'command': '.uno:Signature',
+		// 				'accessibility': { focusBack: true, combination: 'SN' }
+		// 			}
+		// 		]
+		// 	});
+		// }
 
 		if (this._map['wopi']._supportsRename() && this._map['wopi'].UserCanRename) {
 			content.push({
 				'type': 'container',
 				'children': [
-					{
-						'id': 'renamedocument',
-						'class': 'unoRenameDocument',
-						'type': 'bigcustomtoolitem',
-						'text': _('Rename'),
-						'accessibility': { focusBack: true,	combination: 'RN' }
-					}
+					// {
+					// 	'id': 'renamedocument',
+					// 	'class': 'unoRenameDocument',
+					// 	'type': 'bigcustomtoolitem',
+					// 	'text': _('Rename'),
+					// 	'accessibility': { focusBack: true,	combination: 'RN' }
+					// }
 				]
 			});
 		}
@@ -1461,13 +1461,13 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 				'command': '.uno:ControlCodes',
 				'accessibility': { focusBack: true, combination: 'CC', de: null }
 			},
-			{
-				'id': 'fullscreen',
-				'type': 'bigtoolitem',
-				'text': _UNO('.uno:FullScreen'),
-				'command': '.uno:FullScreen',
-				'accessibility': { focusBack: true, combination: 'F', de: 'E' }
-			},
+			// {
+			// 	'id': 'fullscreen',
+			// 	'type': 'bigtoolitem',
+			// 	'text': _UNO('.uno:FullScreen'),
+			// 	'command': '.uno:FullScreen',
+			// 	'accessibility': { focusBack: true, combination: 'F', de: 'E' }
+			// },
 			{
 				'id': 'zoomreset',
 				'class': 'unozoomreset',
@@ -1548,13 +1548,13 @@ L.Control.NotebookbarWriter = L.Control.Notebookbar.extend({
 				'type': 'bigcustomtoolitem',
 				'text': _('Collapse Tabs')
 			},
-			{
-				'id':'toggledarktheme',
-				'class': 'unotoggledarktheme',
-				'type': 'bigcustomtoolitem',
-				'text': _('Dark Mode'),
-				'accessibility': { focusBack: true, combination: 'D', de: null }
-			},
+			// {
+			// 	'id':'toggledarktheme',
+			// 	'class': 'unotoggledarktheme',
+			// 	'type': 'bigcustomtoolitem',
+			// 	'text': _('Dark Mode'),
+			// 	'accessibility': { focusBack: true, combination: 'D', de: null }
+			// },
 			{
 			    'id':'invertbackground',
 			    'class': 'unoinvertbackground',

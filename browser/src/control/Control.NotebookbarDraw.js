@@ -114,13 +114,13 @@ L.Control.NotebookbarDraw = L.Control.NotebookbarImpress.extend({
 				'text': _('View'),
 				'name': 'View',
 				'accessibility': { focusBack: true, combination: 'V', de: null }
-			},
-			{
-				'id': 'Help-tab-label',
-				'text': _('Help'),
-				'name': 'Help',
-				'accessibility': { focusBack: true, combination: 'Y', de: null }
-			}
+			}//,
+			// {
+			// 	'id': 'Help-tab-label',
+			// 	'text': _('Help'),
+			// 	'name': 'Help',
+			// 	'accessibility': { focusBack: true, combination: 'Y', de: null }
+			// }
 		];
 	},
 
@@ -135,7 +135,7 @@ L.Control.NotebookbarDraw = L.Control.NotebookbarImpress.extend({
 			this.getTableTab(),
 			this.getDrawTab(),
 			this.getViewTab(),
-			this.getHelpTab()
+			// this.getHelpTab()
 		];
 	},
 
@@ -163,28 +163,28 @@ L.Control.NotebookbarDraw = L.Control.NotebookbarImpress.extend({
 			}
 
 		if (!this.map['wopi'].UserCanNotWriteRelative) {
-			content.push(
-				{
-					'id': 'file-saveas',
-					'type': 'bigtoolitem',
-					'text': _UNO('.uno:SaveAs', 'presentation'),
-					'command': '.uno:SaveAs',
-					'accessibility': { focusBack: true, combination: 'SA', de: null }
-				}
-			);
+			// content.push(
+			// 	{
+			// 		'id': 'file-saveas',
+			// 		'type': 'bigtoolitem',
+			// 		'text': _UNO('.uno:SaveAs', 'presentation'),
+			// 		'command': '.uno:SaveAs',
+			// 		'accessibility': { focusBack: true, combination: 'SA', de: null }
+			// 	}
+			// );
 		}
 
 		if (!this.map['wopi'].UserCanNotWriteRelative) {
-			content.push(
-				{
-					'id': 'exportas:ExportAsMenu',
-					'command': 'exportas',
-					'class': 'unoexportas',
-					'type': 'exportmenubutton',
-					'text': _('Export As'),
-					'accessibility': { focusBack: true, combination: 'EA', de: null }
-				}
-			);
+			// content.push(
+			// 	{
+			// 		'id': 'exportas:ExportAsMenu',
+			// 		'command': 'exportas',
+			// 		'class': 'unoexportas',
+			// 		'type': 'exportmenubutton',
+			// 		'text': _('Export As'),
+			// 		'accessibility': { focusBack: true, combination: 'EA', de: null }
+			// 	}
+			// );
 		}
 
 		content.push(
@@ -297,33 +297,33 @@ L.Control.NotebookbarDraw = L.Control.NotebookbarImpress.extend({
 					}
 				]
 			});
-		if (window.documentSigningEnabled) {
-			content.push(
-				{
-					'type': 'container',
-					'children': [
-						{
-							'id': 'signature',
-							'type': 'bigtoolitem',
-							'text': _('Signature'),
-							'command': '.uno:Signature',
-							'accessibility': { focusBack: true, combination: 'SN' }
-						}
-					]
-				}
-			);
-		}
+		// if (window.documentSigningEnabled) {
+		// 	content.push(
+		// 		{
+		// 			'type': 'container',
+		// 			'children': [
+		// 				{
+		// 					'id': 'signature',
+		// 					'type': 'bigtoolitem',
+		// 					'text': _('Signature'),
+		// 					'command': '.uno:Signature',
+		// 					'accessibility': { focusBack: true, combination: 'SN' }
+		// 				}
+		// 			]
+		// 		}
+		// 	);
+		// }
 		if (this._map['wopi']._supportsRename() && this._map['wopi'].UserCanRename) {
 			content.push(
 				{
 					'type': 'container',
 					'children': [
-						{
-							'id': 'renamedocument',
-							'class': 'unoRenameDocument',
-							'type': 'bigcustomtoolitem',
-							'text': _('Rename'),
-						}
+						// {
+						// 	'id': 'renamedocument',
+						// 	'class': 'unoRenameDocument',
+						// 	'type': 'bigcustomtoolitem',
+						// 	'text': _('Rename'),
+						// }
 					]
 				}
 			);
@@ -449,12 +449,12 @@ L.Control.NotebookbarDraw = L.Control.NotebookbarImpress.extend({
 				],
 				'vertical': 'true'
 			},
-			{
-				'id':'toggledarktheme',
-				'type': 'bigcustomtoolitem',
-				'text': _('Dark Mode'),
-				'accessibility': { focusBack: true, combination: 'DT', de: null }
-			},
+			// {
+			// 	'id':'toggledarktheme',
+			// 	'type': 'bigcustomtoolitem',
+			// 	'text': _('Dark Mode'),
+			// 	'accessibility': { focusBack: true, combination: 'DT', de: null }
+			// },
 			{
                 'id':'invertbackground',
                 'class': 'unoinvertbackground',

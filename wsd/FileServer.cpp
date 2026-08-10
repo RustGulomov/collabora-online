@@ -1660,6 +1660,13 @@ FileServerRequestHandler::ResourceAccessDetails FileServerRequestHandler::prepro
     std::string savedUIState = "true";
     const std::string& theme = urv[BRANDING_THEME];
 
+    const auto& config = Application::instance().config();
+
+    // UI defaults from config, overridden by the ui_defaults request parameter if present.
+    std::string uiDefaults = config.getString("user_interface.ui_defaults", "");
+    if (!urv[UI_DEFAULTS].empty())
+        uiDefaults = urv[UI_DEFAULTS];
+
     Poco::replaceInPlace(preprocess, ACCESS_TOKEN, urv[ACCESS_TOKEN]);
     Poco::replaceInPlace(preprocess, ACCESS_TOKEN_TTL, urv[ACCESS_TOKEN_TTL]);
     Poco::replaceInPlace(preprocess, ACCESS_HEADER, urv[ACCESS_HEADER]);
@@ -1668,7 +1675,7 @@ FileServerRequestHandler::ResourceAccessDetails FileServerRequestHandler::prepro
     Poco::replaceInPlace(preprocess, std::string("%COOLWSD_VERSION%"), Util::getCoolVersion());
     Poco::replaceInPlace(preprocess, std::string("%SERVICE_ROOT%"), responseRoot);
     Poco::replaceInPlace(preprocess, UI_DEFAULTS, macaron::Base64::Encode(
-                         uiDefaultsToJSON(urv[UI_DEFAULTS], userInterfaceMode, userInterfaceTheme, savedUIState)));
+                         uiDefaultsToJSON(uiDefaults, userInterfaceMode, userInterfaceTheme, savedUIState)));
     Poco::replaceInPlace(preprocess, std::string("%UI_THEME%"), userInterfaceTheme); // UI_THEME refers to light or dark theme
     Poco::replaceInPlace(preprocess, BRANDING_THEME, urv[BRANDING_THEME]);
     Poco::replaceInPlace(preprocess, std::string("%SAVED_UI_STATE%"), savedUIState);
@@ -1676,8 +1683,6 @@ FileServerRequestHandler::ResourceAccessDetails FileServerRequestHandler::prepro
     Poco::replaceInPlace(preprocess, CHECK_FILE_INFO_OVERRIDE,
                          checkFileInfoToJSON(urv[CHECK_FILE_INFO_OVERRIDE]));
     Poco::replaceInPlace(preprocess, std::string("%WOPI_HOST_ID%"), form.get("host_session_id", ""));
-
-    const auto& config = Application::instance().config();
 
     std::string protocolDebug = stringifyBoolFromConfig(config, "logging.protocol", false);
     Poco::replaceInPlace(preprocess, std::string("%PROTOCOL_DEBUG%"), protocolDebug);
