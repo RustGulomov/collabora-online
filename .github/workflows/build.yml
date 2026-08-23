@@ -1,6 +1,11 @@
 name: build dev
-on: [workflow_dispatch]
-
+on:
+  workflow_dispatch:
+    inputs:
+      libs_version:
+        description: 'Версия библиотек платформы. Этот компонент её не использует, параметр принимается ради единого контракта сборки.'
+        required: false
+        default: ''
 jobs:
 
   build_app:
