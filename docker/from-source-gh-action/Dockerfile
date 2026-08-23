@@ -3,6 +3,12 @@ FROM ubuntu:24.04 AS builder
 ENV CORE_ASSETS https://github.com/CollaboraOnline/online/releases/download/for-code-assets/core-co-25.04-assets.tar.gz
 ENV BUILDDIR /build
 ENV ONLINE_EXTRA_BUILD_OPTIONS --enable-experimental
+# Which Collabora Online source to build. This repository IS the online source,
+# so the defaults in build.sh (upstream master) would build somebody else's code.
+ARG ONLINE_REPO=https://github.com/RustGulomov/collabora-online.git
+ARG ONLINE_BRANCH=release/26.3
+ENV COLLABORA_ONLINE_REPO=$ONLINE_REPO
+ENV COLLABORA_ONLINE_BRANCH=$ONLINE_BRANCH
 
 WORKDIR /build
 

@@ -73,11 +73,13 @@ fi
 
 
 # Clone online repo
+# The clone is shallow, so a branch other than the remote default has no local
+# ref to check out afterwards: "git checkout $BRANCH" fails with "pathspec did
+# not match". Asking for the branch at clone time is the only way that works
+# with --depth=1.
 if test ! -d online ; then
-  git clone --depth=1 "$COLLABORA_ONLINE_REPO" online || exit 1
+  git clone --depth=1 --branch "$COLLABORA_ONLINE_BRANCH" "$COLLABORA_ONLINE_REPO" online || exit 1
 fi
-
-( cd online && git fetch --all && git checkout -f $COLLABORA_ONLINE_BRANCH && git clean -f -d && git pull -r ) || exit 1
 
 ##### LOKit (core) #####
 

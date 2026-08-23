@@ -35,6 +35,7 @@ jobs:
           # контексте COPY /start-collabora-online.sh не находит файла, и сборка
           # падает — так она не проходила здесь ни разу.
           docker build -f docker/from-source-gh-action/Dockerfile \
+            --build-arg ONLINE_BRANCH="${{steps.gen_tags.outputs.tag}}" \
             -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}" \
             -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.source_tag}}" \
             docker/from-source-gh-action
