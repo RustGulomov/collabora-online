@@ -25,10 +25,19 @@ jobs:
         id: gen_tags
         run: |
           echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
+          echo "source_tag=sha-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
 
       - name: Build and tag image
         run: |
-          docker build -f docker/from-source-gh-action/Dockerfile -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}" .
+          # Контекст сборки — каталог самого Dockerfile, а не корень репозитория.
+          # COPY / $BUILDDIR/ переносит в образ ровно build.sh и стартовый скрипт,
+          # а исходники Collabora build.sh забирает сам. С корнем репозитория в
+          # контексте COPY /start-collabora-online.sh не находит файла, и сборка
+          # падает — так она не проходила здесь ни разу.
+          docker build -f docker/from-source-gh-action/Dockerfile \
+            -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}" \
+            -t "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.source_tag}}" \
+            docker/from-source-gh-action
 
       - name: Docker login
         run: docker login registry.vaulterix.ru -u ${{secrets.REGISTRY_USER}} -p ${{secrets.REGISTRY_PASSWORD}}
@@ -36,4 +45,6 @@ jobs:
       - name: Publish image
         env:
           IMAGE_NAME: $GITHUB_REPOSITORY
-        run: docker push "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}"
+        run: |
+          docker push "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.tag}}"
+          docker push "${{ steps.global_env.outputs.DOCKERHUB_IMAGE_NAME }}:${{steps.gen_tags.outputs.source_tag}}"
